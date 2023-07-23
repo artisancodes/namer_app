@@ -16,8 +16,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Namer App',
         theme: ThemeData(
-            useMaterial3: true,
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange)),
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+        ),
         home: MyHomePage(),
       ),
     );
@@ -36,6 +37,17 @@ class MyAppState extends ChangeNotifier {
     // This method ensures that anyone watching MyAppState is notified.
     notifyListeners();
   }
+
+  var favorites = <WordPair>{};
+
+  void toggleFavorites() {
+    if (favorites.contains(current)) {
+      favorites.remove(current);
+    } else {
+      favorites.add(current);
+    }
+    notifyListeners();
+  }
 }
 
 class MyHomePage extends StatelessWidget {
@@ -45,25 +57,45 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     // MyHomePage tracks changes to the app's current state using the watch method.
     var appState = context.watch<MyAppState>();
-
     var pair = appState.current;
+
+    IconData icon;
+    if (appState.favorites.contains(pair)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_border;
+    }
 
     // Every build method must return a widget or a nested tree of widgets.
     // In this case, the top-level widget is Scaffold.
     return Scaffold(
       // Column is one of the most basic layout widgets in Flutter.
       // I takes any numver of children and puts them in a column from top to bottom.
-      body: Column(
-        children: [
-          Text('A random AWESOME ideia: '),
-          // This widget takes appState, and accesses the only member of that
-          // class (current).
-          BigCard(pair: pair),
-          ElevatedButton(
-            onPressed: () => appState.getNext(),
-            child: Text('Next'),
-          )
-        ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // This widget takes appState, and accesses the only member of that
+            // class (current).
+            BigCard(pair: pair),
+            SizedBox(height: 10),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () => appState.toggleFavorites(),
+                  icon: Icon(icon),
+                  label: Text('Like'),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () => appState.getNext(),
+                  child: Text('Next'),
+                )
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
@@ -79,13 +111,22 @@ class BigCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // requests the app's current theme
     final theme = Theme.of(context);
+    final style = theme.textTheme.displayMedium!.copyWith(
+      color: theme.colorScheme.onPrimary,
+    );
 
     return Card(
+      // defines the card's color to be the same as the theme.
       color: theme.colorScheme.primary,
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Text(pair.asLowerCase),
+        child: Text(
+          pair.asLowerCase,
+          style: style,
+          semanticsLabel: "$pair.first $pair.second",
+        ),
       ),
     );
   }
