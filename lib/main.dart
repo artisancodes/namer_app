@@ -46,6 +46,8 @@ class MyHomePage extends StatelessWidget {
     // MyHomePage tracks changes to the app's current state using the watch method.
     var appState = context.watch<MyAppState>();
 
+    var pair = appState.current;
+
     // Every build method must return a widget or a nested tree of widgets.
     // In this case, the top-level widget is Scaffold.
     return Scaffold(
@@ -56,12 +58,34 @@ class MyHomePage extends StatelessWidget {
           Text('A random AWESOME ideia: '),
           // This widget takes appState, and accesses the only member of that
           // class (current).
-          Text(appState.current.asLowerCase),
+          BigCard(pair: pair),
           ElevatedButton(
             onPressed: () => appState.getNext(),
             child: Text('Next'),
           )
         ],
+      ),
+    );
+  }
+}
+
+class BigCard extends StatelessWidget {
+  const BigCard({
+    super.key,
+    required this.pair,
+  });
+
+  final WordPair pair;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Card(
+      color: theme.colorScheme.primary,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Text(pair.asLowerCase),
       ),
     );
   }
