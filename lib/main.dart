@@ -65,61 +65,68 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     Widget page;
+
+    // Assigns a screen to page Widget, according to the current value in selectedIndex.
     switch (selectedIndex) {
       case 0:
         page = GeneratorPage();
         break;
       case 1:
+        // Since there's no FavoritesPage yet, use Placholder (handy widget).
         page = Placeholder();
         break;
       default:
+        // Throw and error if selectedIndex is neither 0 or 1
+        // This helps prevent bugs.
         throw UnimplementedError('no widget for $selectedIndex');
     }
 
     // Every build method must return a widget or a nested tree of widgets.
     // In this case, the top-level widget is Scaffold.
-    return Scaffold(
-        // Column is one of the most basic layout widgets in Flutter.
-        // I takes any numver of children and puts them in a column from top to bottom.
-        body: Row(
-      children: [
-        // The SafeArea ensures that its child is not obscured by a hardware
-        // notch or a status bar.
-        SafeArea(
-          // Widget that meant to be displayed at the left or right of an app
-          // to navigate between a small number of views (between 3 and 5).
-          // For smaller layouts, like mobile portrait, a BottomNavigationBar
-          // should be used instead.
-          child: NavigationRail(
-            extended: true,
-            destinations: [
-              NavigationRailDestination(
-                icon: Icon(Icons.home),
-                label: Text('Home'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.favorite),
-                label: Text('Favorites'),
-              ),
-            ],
-            selectedIndex: selectedIndex,
-            onDestinationSelected: (value) {
-              setState(() {
-                selectedIndex = value;
-              });
-            },
+    return LayoutBuilder(builder: (context, constraints) {
+      return Scaffold(
+          // Column is one of the most basic layout widgets in Flutter.
+          // I takes any numver of children and puts them in a column from top to bottom.
+          body: Row(
+        children: [
+          // The SafeArea ensures that its child is not obscured by a hardware
+          // notch or a status bar.
+          SafeArea(
+            // Widget that meant to be displayed at the left or right of an app
+            // to navigate between a small number of views (between 3 and 5).
+            // For smaller layouts, like mobile portrait, a BottomNavigationBar
+            // should be used instead.
+            child: NavigationRail(
+              extended: constraints.maxWidth >= 600,
+              destinations: [
+                NavigationRailDestination(
+                  icon: Icon(Icons.home),
+                  label: Text('Home'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.favorite),
+                  label: Text('Favorites'),
+                ),
+              ],
+              selectedIndex: selectedIndex,
+              onDestinationSelected: (value) {
+                setState(() {
+                  selectedIndex = value;
+                });
+              },
+            ),
           ),
-        ),
-        // Using an Expanded widget makes a child of Row, Column, or Flex so that
-        // the child fills the available space.
-        Expanded(
-          child: Container(
-            color: Theme.of(context).colorScheme.primaryContainer,
-            child: page,
+          // Using an Expanded widget makes a child of Row, Column, or Flex so that
+          // the child fills the available space.
+          Expanded(
+            child: Container(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: page,
+            ),
           ),
-        ),
-      ],
-    ));
+        ],
+      ));
+    });
   }
 }
 
