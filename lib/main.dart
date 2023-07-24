@@ -50,11 +50,32 @@ class MyAppState extends ChangeNotifier {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+// The underscore at the start of _MyHomePageState makes that class private and
+// is enforced by the compiler
+class _MyHomePageState extends State<MyHomePage> {
+  var selectedIndex = 0;
+
   // Every widget defines a build() method that's automatically called every time
   // the widget's circumstances changes so that the widget is always up to date.
   @override
   Widget build(BuildContext context) {
+    Widget page;
+    switch (selectedIndex) {
+      case 0:
+        page = GeneratorPage();
+        break;
+      case 1:
+        page = Placeholder();
+        break;
+      default:
+        throw UnimplementedError('no widget for $selectedIndex');
+    }
+
     // Every build method must return a widget or a nested tree of widgets.
     // In this case, the top-level widget is Scaffold.
     return Scaffold(
@@ -70,7 +91,7 @@ class MyHomePage extends StatelessWidget {
           // For smaller layouts, like mobile portrait, a BottomNavigationBar
           // should be used instead.
           child: NavigationRail(
-            extended: false,
+            extended: true,
             destinations: [
               NavigationRailDestination(
                 icon: Icon(Icons.home),
@@ -81,8 +102,12 @@ class MyHomePage extends StatelessWidget {
                 label: Text('Favorites'),
               ),
             ],
-            selectedIndex: 0,
-            onDestinationSelected: (value) => print('selected: $value'),
+            selectedIndex: selectedIndex,
+            onDestinationSelected: (value) {
+              setState(() {
+                selectedIndex = value;
+              });
+            },
           ),
         ),
         // Using an Expanded widget makes a child of Row, Column, or Flex so that
@@ -90,7 +115,7 @@ class MyHomePage extends StatelessWidget {
         Expanded(
           child: Container(
             color: Theme.of(context).colorScheme.primaryContainer,
-            child: GeneratorPage(),
+            child: page,
           ),
         ),
       ],
