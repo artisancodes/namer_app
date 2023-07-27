@@ -73,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
       case 1:
         // Since there's no FavoritesPage yet, use Placholder (handy widget).
-        page = Placeholder();
+        page = FavoritesPage();
         break;
       default:
         // Throw and error if selectedIndex is neither 0 or 1
@@ -127,6 +127,33 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ));
     });
+  }
+}
+
+class FavoritesPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+
+    if (appState.favorites.isEmpty) {
+      return Center(
+        child: Text('No Favorites yet.'),
+      );
+    }
+
+    return ListView(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text('You have ${appState.favorites.length} favorites:'),
+        ),
+        for (var pair in appState.favorites)
+          ListTile(
+            leading: Icon(Icons.favorite),
+            title: Text(pair.asLowerCase),
+          )
+      ],
+    );
   }
 }
 
@@ -189,15 +216,28 @@ class BigCard extends StatelessWidget {
       color: theme.colorScheme.onPrimary,
     );
 
+    var firstWord = pair.first;
+    var secondWord = pair.second;
+
     return Card(
       // defines the card's color to be the same as the theme.
       color: theme.colorScheme.primary,
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Text(
-          pair.asLowerCase,
-          style: style,
-          semanticsLabel: "$pair.first $pair.second",
+        child: RichText(
+          text: TextSpan(
+            style: style,
+            children: <TextSpan>[
+              TextSpan(
+                text: firstWord,
+                style: TextStyle(fontWeight: FontWeight.w100),
+              ),
+              TextSpan(
+                text: secondWord,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              )
+            ],
+          ),
         ),
       ),
     );
